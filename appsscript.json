@@ -1,0 +1,26 @@
+{
+  "timeZone": "America/New_York",
+  "dependencies": {},
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "sheets": {
+    "macros": [
+      {
+        "menuName": "Macro senza titolo",
+        "functionName": "Macrosenzatitolo"
+      },
+      {
+        "menuName": "Clear",
+        "functionName": "Clear"
+      },
+      {
+        "menuName": "Lista_ctrl",
+        "functionName": "Lista_ctrl"
+      },
+      {
+        "menuName": "controlla_nome",
+        "functionName": "controlla_nome"
+      }
+    ]
+  }
+}
