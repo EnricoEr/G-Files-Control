@@ -16,17 +16,17 @@ function getOwnName(){
 
   }
 
-Logger.log(userName);
-return userName;
+  Logger.log(userName);
+  return userName;
 }
 
 function controlla_nome_folder_ (foldername,father){
 
-//Logger.log(foldername + " - " + father)
+  //Logger.log(foldername + " - " + father)
   ctrl = ""
   try {
     if (foldername == "Quantum Biology")  return ctrl
-    if (foldername == "RWings") return ctrl
+    if (foldername == "Research Wings") return ctrl
 
     if (foldername.indexOf("#Dept - ") != -1) {
       if (father.indexOf("#OU") != -1) {
@@ -35,31 +35,25 @@ function controlla_nome_folder_ (foldername,father){
         ctrl = "#Dept must be child of #OU"
       }
     } else if (foldername.indexOf("#S - ") != -1)  {
-      if (father.indexOf("#Dept") != -1 || father.indexOf("#OU") != -1 ||  father.indexOf("#WF") != -1 || father.indexOf("#ib") != -1 ) {
+      if (father.indexOf("#Dept") != -1 || father.indexOf("#OU") != -1 ||  father.indexOf("#S") != -1 ) {
         ctrl = ""
       } else {
-        ctrl = "#S must be child of #OU or #Dept"
+        ctrl = "#S must be child of #OU or #Dept or #S"
       }
-    } else if (foldername.indexOf("#WF - ") != -1)  {
-      if (father.indexOf("#WF") != -1 || father.indexOf("#Dept") != -1  || father.indexOf("#S") != -1 ) {
+    } else if (foldername.indexOf("#ib - ") != -1 ) {
+      if (father.indexOf("#S") != -1 ) {
         ctrl = ""
       } else {
-        ctrl = "#WF must be child of #Dept or #S or  #WF"
-      }
-    } else if (foldername.indexOf("#ib - ") != -1) {
-      if (father.indexOf("#WF") != -1  ) {
-        ctrl = ""
-      } else {
-        ctrl = "#ib must be child of #WF or #ib"
+        ctrl = "#ib must be child of #S"
       }
     } else if (foldername.indexOf("#OU - ") != -1) {
-      if (father == "Quantum Biology" || father == "RWings") {
+      if (father == "Quantum Biology" || father == "Research Wings") {
         ctrl = ""
       } else {
         ctrl = "#OU must be child of a company"
       }
     } else {
-      ctrl = "folder must be one of these categories: '#OU - ', '#Dept - ', '#S - ', '#WF - ' or '#ib - '" 
+      ctrl = "folder must be one of these categories: '#OU - ', '#Dept - ', '#S - ' or '#ib - '" 
     }
 
     // #IK
@@ -86,7 +80,7 @@ function controlla_file_nome_ (FileItem) {
     var Filename = FileItem.getName()
     var Filetipe = FileItem.getMimeType()
 
-    //if (Filetipe.indexOf("shortcut") != -1) return ctrl
+    if (Filetipe.indexOf("shortcut") != -1) return ctrl
     
     // date control
 
