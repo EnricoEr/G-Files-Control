@@ -60,91 +60,108 @@ function getPermissionsList(fileId) {
 
 function Lista_ctrl() {
 
-  Clear()
-  Hash_init()
+  try {
 
-  var sheet = SpreadsheetApp.getActive();
-  sheet.appendRow([ "Name", "URL",  "Owner", "Control" ]);
+    Clear()
+    Hash_init()
 
-  const getFileList = (id, folders = []) => {
-    const f = DriveApp.getFolderById(id);
-    const fols = f.getFolders();
-    let temp = [];
-    while (fols.hasNext()) {
-      const fol = fols.next();
+    var sheet = SpreadsheetApp.getActive();
+    sheet.appendRow([ "Name", "URL",  "Owner", "Control" ]);
 
-      ctrl_folder(fol.getId());
+    const getFileList = (id, folders = []) => {
+      const f = DriveApp.getFolderById(id);
+      const fols = f.getFolders();
+      let temp = [];
+      while (fols.hasNext()) {
+        const fol = fols.next();
 
-      const files = fol.getFiles();
-      let fileList = [];
-      while (files.hasNext()) {
-        const file = files.next();
+        ctrl_folder(fol.getId());
 
-        /*
-        var parentFolder = file.getParents()
-        while (parentFolder.hasNext()) {
-          var Pfolder = parentFolder.next();
+        const files = fol.getFiles();
+        let fileList = [];
+        while (files.hasNext()) {
+          const file = files.next();
+
+          var  email = find_mail_owner(file.getId())
+          var parentFolder = file.getParents()
+          while (parentFolder.hasNext()) {
+            var Pfolder = parentFolder.next();
+          }
+          if (Pfolder.getName().indexOf("#ib") == -1) {
+            if (Pfolder.getName().indexOf("#S") > -1) {
+
+              var Ibfolderid = createFolder(Pfolder.getName(), "ib - Documents", Pfolder.getId())
+              var Ibfolder = DriveApp.getFolderById(Ibfolderid)
+              file.moveTo(Ibfolder)  
+
+              data = [
+                file.getName(),
+                file.getUrl(),
+                email,
+                "Il file si trovava in un folder "+ Pfolder.getName() + " che non è un #ib, spostato in '#ib - Documents' "
+              ];
+            } else {
+              data = [
+                file.getName(),
+                file.getUrl(),
+                email,
+                "Il file si trova in un folder "+ Pfolder.getName() + " che non è un #ib"
+              ];
+            }
+            sheet.appendRow(data);
+          }
+          
+          ctrl = controlla_file_nome_(file)
+          if (ctrl != "") {
+            data = [
+              file.getName(),
+              file.getUrl(),
+              email,
+              ctrl
+            ];
+
+            sheet.appendRow(data);
+          }
+
+          //Logger.log("1->" + file.getName())
+          ctrl = verify_h_file(file.getName(),"File")
+          if (ctrl != "") {
+
+            data = [
+              file.getName(),
+              file.getUrl(),
+              email,
+              ctrl + " is not allowed for Files"
+            ];
+
+            // Write 
+            sheet.appendRow(data);
+          }
+          
+          fileList.push({ name: file.getName(), id: file.getId() });
         }
-        if (Pfolder.getName().indexOf("#ib") == -1) {
-          data = [
-            file.getName(),
-            file.getUrl(),
-            email,
-            "Il file si trova in un folder "+ Pfolder.getName() + " che non è un #ib "
-          ];
-
-          sheet.appendRow(data);
-
-        }
-        */
-
-        var  email = find_mail_owner(file.getId())
-        ctrl = controlla_file_nome_(file)
-        if (ctrl != "") {
-          data = [
-            file.getName(),
-            file.getUrl(),
-            email,
-            ctrl
-          ];
-
-          sheet.appendRow(data);
-        }
-
-        //Logger.log("1->" + file.getName())
-        ctrl = verify_h_file(file.getName(),"File")
-        if (ctrl != "") {
-
-          data = [
-            file.getName(),
-            file.getUrl(),
-            email,
-            ctrl + " is not allowed for Files"
-          ];
-
-          // Write 
-          sheet.appendRow(data);
-        }
-        
-        fileList.push({ name: file.getName(), id: file.getId() });
+        temp.push({
+          name: fol.getName(),
+          id: fol.getId(),
+          parent: id,
+          parentName: f.getName(),
+          files: fileList,
+        });
       }
-      temp.push({
-        name: fol.getName(),
-        id: fol.getId(),
-        parent: id,
-        parentName: f.getName(),
-        files: fileList,
-      });
-    }
-    if (temp.length > 0) {
-      folders.push(temp);
-      temp.forEach((e) => getFileList(e.id, folders));
-    }
-    return folders;
-  };
+      if (temp.length > 0) {
+        folders.push(temp);
+        temp.forEach((e) => getFileList(e.id, folders));
+      }
+      return folders;
+    };
 
-  const res = getFileList(folderId);
-  //console.log(res);
+    const res = getFileList(folderId);
+    //console.log(res);
+  
+  } catch (e) {
+    Logger.log ("Lista_ctrl error ->" + e)
+  }
+
 }
 
 function ctrl_folder(folderId) {
@@ -181,18 +198,7 @@ function ctrl_folder(folderId) {
       folder.setName (pippo)
     }
     */
- 
-
     //Logger.log("folder->"+folder.getName())
-    /*
-    if (folder.getName() == "#ib - Com external") {
-      folder.setName ("#ib - eMail")
-      //Logger.log("email , father->"+father)
-    } else if (folder.getName() == "#ib - Com internal") {
-      parent.removeFolder(folder)
-      //Logger.log("erase com internal , father->"+father)
-    }
-    */
 
     if (ctrl != "") {
       data = [
